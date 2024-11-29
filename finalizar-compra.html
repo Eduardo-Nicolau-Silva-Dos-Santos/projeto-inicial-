@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Compra</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Menu de Navegação -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html"><img src="IMG/logo.jpeg" alt="Logo do Depósito do Paulo Victor"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Início</a></li>
+            <li><a href="sobre.html">Sobre</a></li>
+        </ul>
+        <div class="cart-icon">
+            <a href="carrinho.html"><img src="IMG/carrinho-icon.png" alt="Carrinho"></a>
+        </div>
+    </nav>
+
+    <div class="finalizar-compra-container">
+        <header class="carrinho-header text-center">
+            <h2>Finalize Sua Compra</h2>
+        </header>
+
+        <div class="finalizar-compra-content">
+            <!-- Informações do Cliente e Seleção de Pagamento -->
+            <section class="dados-cliente">
+                <form id="form-compra">
+                    <label for="nome">Nome Completo:</label>
+                    <input type="text" id="nome" name="nome" required placeholder="Seu nome" />
+
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" name="email" required placeholder="Seu e-mail" />
+
+                    <label for="endereco">Endereço:</label>
+                    <input type="text" id="endereco" name="endereco" required placeholder="Seu endereço" />
+
+                    <label for="endereco">Telefone:</label>
+                    <input type="text" id="Telefone" name="Telefone" required placeholder="Seu Telefone" />
+                </form>
+
+                <!-- Escolha da Forma de Pagamento -->
+                <section class="opcao-pagamento text-center">
+                    <h3>Escolha a Forma de Pagamento</h3>
+                    <div class="opcoes-pagamento">
+                        <button id="pix" class="pagamento-btn" onclick="exibirValor('Pix')">
+                            <img src="IMG/pix-icon.png" alt="Pix" />
+                            Pix
+                        </button>
+                        <button id="cartao" class="pagamento-btn" onclick="exibirValor('Cartão')">
+                            <img src="IMG/cartao-icon.png" alt="Cartão" />
+                            Cartão
+                        </button>
+                        <button id="boleto" class="pagamento-btn" onclick="exibirValor('Boleto')">
+                            <img src="IMG/boleto-con.png" alt="Boleto" />
+                            Boleto
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Detalhes específicos de pagamento -->
+                <div id="detalhes-pagamento">
+                    <div id="detalhes-pix" class="detalhe-pagamento">
+                        <label for="chave-pix">Digite a chave Pix:</label>
+                        <input type="text" id="chave-pix" placeholder="Insira sua chave Pix" />
+                    </div>
+                    <div id="detalhes-cartao" class="detalhe-pagamento">
+                        <label for="nome-cartao">Nome como no Cartão:</label>
+                        <input type="text" id="nome-cartao" placeholder="Nome completo" />
+
+                        <label for="numero-cartao">Número do Cartão:</label>
+                        <input type="text" id="numero-cartao" placeholder="0000 0000 0000 0000" maxlength="19" />
+
+                        <label for="validade-cartao">Validade (MM/AA):</label>
+                        <input type="text" id="validade-cartao" placeholder="MM/AA" maxlength="5" />
+
+                        <label for="cvv-cartao">CVV:</label>
+                        <input type="text" id="cvv-cartao" placeholder="123" maxlength="3" />
+                    </div>
+                    <div id="detalhes-boleto" class="detalhe-pagamento">
+                        <p>Clique no botão abaixo para gerar o boleto:</p>
+                        <a href="boleto.pdf" download class="boleto-link">Baixar Boleto</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resumo da Compra e Total -->
+            <section class="resumo-compra">
+                <h3>Resumo da Compra</h3>
+                <ul id="resumo-carrinho"></ul>
+                <p><strong>Total:</strong> R$ <span id="produto-total"></span></p>
+                <div id="valor-pagamento" class="mt-3"></div>
+                <button class="comprar-btn" id="finalizar-btn" onclick="finalizarCompra()">Finalizar Compra</button>
+            </section>
+        </div>
+
+        <div id="mensagem-feedback" class="hidden">
+            <h2>Obrigado pela sua compra!</h2>
+            <p>Você será redirecionado para a página inicial em breve...</p>
+        </div>
+    </div>
+
+    <script>
+        let metodoPagamento = null;
+    
+        function carregarResumo() {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            const resumoCarrinho = document.getElementById('resumo-carrinho');
+            let totalCompra = 0;
+    
+            resumoCarrinho.innerHTML = '';
+            carrinho.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = `${item.nome} - Quantidade: ${item.quantidade} - R$ ${item.total.toFixed(2)}`;
+                resumoCarrinho.appendChild(li);
+                totalCompra += item.total;
+            });
+    
+            document.getElementById('produto-total').innerText = totalCompra.toFixed(2);
+        }
+    
+        function exibirValor(pagamento) {
+            metodoPagamento = pagamento;
+    
+            // Remove destaque dos botões previamente selecionados
+            const botoesPagamento = document.querySelectorAll('.pagamento-btn');
+            botoesPagamento.forEach(btn => btn.classList.remove('selected'));
+    
+            // Adiciona destaque ao botão selecionado
+            const botaoSelecionado = document.getElementById(pagamento.toLowerCase());
+            botaoSelecionado.classList.add('selected');
+    
+            // Oculta todos os detalhes de pagamento
+            const detalhes = document.querySelectorAll('.detalhe-pagamento');
+            detalhes.forEach(det => det.style.display = 'none');
+    
+            // Exibe os campos correspondentes ao método de pagamento selecionado
+            const detalheSelecionado = document.getElementById(`detalhes-${pagamento.toLowerCase()}`);
+            if (detalheSelecionado) {
+                detalheSelecionado.style.display = 'block';
+            }
+        }
+    
+        // Formatação automática do número do cartão
+        document.addEventListener("input", function (event) {
+            if (event.target.id === "numero-cartao") {
+                let valor = event.target.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                valor = valor.match(/.{1,4}/g)?.join(' ') || valor; // Agrupa em blocos de 4 dígitos
+                event.target.value = valor;
+            }
+        });
+    
+        function finalizarCompra() {
+            if (!metodoPagamento) {
+                alert("Por favor, selecione uma forma de pagamento.");
+                return;
+            }
+    
+            // Oculta a área de resumo e exibe mensagem de sucesso
+            document.querySelector('.finalizar-compra-content').style.display = 'none';
+            document.getElementById('mensagem-feedback').classList.remove('hidden');
+    
+            // Limpa o carrinho e redireciona após 3 segundos
+            localStorage.removeItem('carrinho');
+            setTimeout(() => window.location.href = 'index.html', 3000);
+        }
+    
+        carregarResumo();
+    </script>
+    
+    <style>
+        .detalhe-pagamento {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #mensagem-feedback {
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</body>
+</html>

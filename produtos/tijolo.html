@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Tijolo - Depósito do Paulo Victor</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Estilos Customizados -->
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <!-- Menu de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <img src="../IMG/logo.jpeg" alt="Logo do Depósito do Paulo Victor" style="height: 50px;">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../sobre.html">Sobre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../carrinho.html">
+                            <img src="../IMG/carrinho-icon.png" alt="Carrinho de Compras" style="height: 24px;">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container my-5">
+        <!-- Header -->
+        <header class="text-center mb-5">
+            <h1 class="display-4">Tijolo</h1>
+            <p class="lead">O melhor tijolo para suas construções, com resistência, durabilidade e um ótimo custo-benefício!</p>
+        </header>
+
+        <!-- Detalhes do Produto -->
+        <div class="row">
+            <!-- Imagem do Produto -->
+            <div class="col-md-6">
+                <img src="../IMG/tijolos.jpg" alt="Tijolo" class="img-fluid rounded">
+            </div>
+
+            <!-- Informações do Produto -->
+            <div class="col-md-6">
+                <h2>Detalhes</h2>
+                <ul>
+                    <li>Resistência</li>
+                    <li>Durabilidade</li>
+                    <li>Beleza</li>
+                    <li>Confiança</li>
+                </ul>
+                <p class="price"><strong>Preço: R$ 5,99</strong></p>
+                <label for="quantidade">Quantidade:</label>
+                <input type="number" id="quantidade" value="1" min="1" class="form-control mb-3" style="width: 100px;">
+                <button id="addToCart" class="btn btn-primary btn-lg">Adicionar ao Carrinho</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Depósito do Paulo Victor. Todos os direitos reservados.</p>
+            <p>Desenvolvido com dedicação por nossa equipe.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script JavaScript -->
+    <script>
+        // Evento de clique no botão de adicionar ao carrinho
+        document.getElementById("addToCart").addEventListener("click", function() {
+            const produto = {
+                nome: "Tijolo",
+                preco: 5.99,
+                quantidade: parseInt(document.getElementById("quantidade").value), // Obtém a quantidade do input
+                imagem: "tijolos.jpg", // Nome da imagem
+            };
+
+            // Verificar se já existe um carrinho no LocalStorage
+            let carrinho = JSON.parse(localStorage.getItem("carrinho"));
+            if (!carrinho) {
+                carrinho = []; // Caso não exista, cria um carrinho vazio
+            }
+
+            // Adicionar o produto ao carrinho
+            const produtoExistente = carrinho.find(item => item.nome === produto.nome);
+            if (produtoExistente) {
+                produtoExistente.quantidade += produto.quantidade;  // Incrementa a quantidade se já existir
+                produtoExistente.total = produtoExistente.quantidade * produtoExistente.preco;  // Atualiza o total
+            } else {
+                produto.total = produto.quantidade * produto.preco;  // Calcula o total do produto
+                carrinho.push(produto);  // Caso contrário, adiciona o novo produto
+            }
+
+            // Atualiza o LocalStorage com o novo carrinho
+            localStorage.setItem("carrinho", JSON.stringify(carrinho));
+
+            // Alerta de produto adicionado ao carrinho
+            alert("Produto adicionado ao carrinho!");
+        });
+    </script>
+</body>
+</html>
